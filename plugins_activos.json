@@ -1,0 +1,18 @@
+{
+  "activos": [
+    "enviar_alerta",
+    "listar_contenido_real",
+    "mapa_total",
+    "buscar_contexto",
+    "rag_responder",
+    "razonar",
+    "leer_archivo_definitivo",
+    "planificar",
+    "descomponer",
+    "autocurar",
+    "leer_log",
+    "objetivos",
+    "leer_logs",
+    "reanudar_objetivo"
+  ]
+}

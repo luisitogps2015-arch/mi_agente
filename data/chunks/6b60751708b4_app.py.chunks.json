@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "source": "app.py",
+  "total_chunks": 2,
+  "chunks": [
+    {
+      "chunk_id": "6b60751708b4_0",
+      "source": "app.py",
+      "source_path": "/home/ubuntu/mi-agente/app.py",
+      "index": 0,
+      "start": 0,
+      "end": 1200,
+      "content": "import threading, time, logging, os\nfrom flask import Flask\nimport telebot\nfrom groq import Groq\nfrom herramientas import TELEGRAM_TOKEN, CHAT_ID, buscar_en_web_real\nfrom mcp_server import procesar_agente\n\nlogging.basicConfig(level=logging.INFO, format=\"%(asctime)s [%(levelname)s] %(message)s\")\nlog = logging.getLogger(__name__)\napp = Flask(__name__)\nbot = telebot.TeleBot(TELEGRAM_TOKEN)\nSALUDOS = {\"hola\",\"hi\",\"buenas\",\"buenos dias\",\"buenas tardes\",\"saludos\"}\n\n@bot.message_handler(func=lambda m: True)\ndef handle_message(message):\n    if message.text.lower().strip() in SALUDOS:\n        bot.reply_to(message, \"Hola! En que puedo ayudarte?\")\n        return\n    try:\n        bot.reply_to(message, procesar_agente(message.text, message.chat.id))\n    except Exception as e:\n        bot.reply_to(message, \"Error al procesar la solicitud.\")\n\ndef ciclo_noticias():\n    groq_client = Groq(api_key=os.getenv(\"GROQ_API_KEY\",\"\"))\n    log.info(\"Ciclo de noticias iniciado.\")\n    time.sleep(60)\n    while True:\n        try:\n            texto = buscar_en_web_real(\"noticias inteligencia artificial Ecuador\")\n            if texto and \"Error\" not in texto:\n                resp = groq_client.chat.completions.cre",
+      "content_hash": "f0969bb014f7e03c3dd708d7361a35d5059ab4102481979277c53152c2fb21cd",
+      "created_at": "2026-06-13T22:14:38.754631"
+    },
+    {
+      "chunk_id": "6b60751708b4_1",
+      "source": "app.py",
+      "source_path": "/home/ubuntu/mi-agente/app.py",
+      "index": 1,
+      "start": 1000,
+      "end": 2038,
+      "content": ":\n        try:\n            texto = buscar_en_web_real(\"noticias inteligencia artificial Ecuador\")\n            if texto and \"Error\" not in texto:\n                resp = groq_client.chat.completions.create(\n                    model=\"llama-3.1-8b-instant\",\n                    messages=[{\"role\":\"user\",\"content\":f\"Resume en 3 puntos clave:\\n{texto}\"}]\n                )\n                bot.send_message(CHAT_ID, f\"RESUMEN AUTOMATICO:\\n\\n{resp.choices[0].message.content}\")\n                log.info(\"Resumen enviado.\")\n        except Exception as e:\n            log.error(f\"Error ciclo noticias: {e}\")\n        time.sleep(3600)\n\ndef iniciar_bot():\n    bot.infinity_polling(timeout=60, long_polling_timeout=60, none_stop=True)\n\n@app.route(\"/health\")\ndef health():\n    return {\"status\":\"ok\"}, 200\n\nif __name__ == \"__main__\":\n    threading.Thread(target=ciclo_noticias, daemon=True).start()\n    threading.Thread(target=iniciar_bot, daemon=True).start()\n    log.info(\"Sistema inicializado. Flask en :5000\")\n    app.run(host=\"0.0.0.0\", port=5000)\n",
+      "content_hash": "b5477a85a62293dd4fb83dd5c6048b5ea6973e15b82d72172ad2a8172eb9b5fb",
+      "created_at": "2026-06-13T22:14:38.754675"
+    }
+  ]
+}

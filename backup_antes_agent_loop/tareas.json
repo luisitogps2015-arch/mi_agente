@@ -1,0 +1,14 @@
+[
+    {
+        "descripcion": "Prueba de funcionamiento",
+        "tarea": "python3 test_tarea.py",
+        "frecuencia": "inmediata",
+        "estado": "inactivo"
+    },
+    {
+        "descripcion": "Noticias IA Ecuador",
+        "tarea": "python3 noticias_agente.py",
+        "frecuencia": "inmediata",
+        "estado": "activo"
+    }
+]

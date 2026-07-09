@@ -1,0 +1,9 @@
+{
+  "nombre": "contexto_general.md",
+  "ruta": "proyectos/proyecto_001/memoria/contexto_general.md",
+  "fecha_ingesta": "2026-06-17T05:34:20.917976",
+  "estado": "INGESTADO",
+  "chunking_strategy": "markdown_headers",
+  "total_chunks": 77,
+  "chunks_file": "/home/ubuntu/mi-agente/data/chunks/7c63d9553237_contexto_general.md.chunks.json"
+}

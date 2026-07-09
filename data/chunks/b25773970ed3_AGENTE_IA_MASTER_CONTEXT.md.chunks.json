@@ -1,0 +1,23 @@
+{
+  "ok": true,
+  "source": "data/AGENTE_IA_MASTER_CONTEXT.md",
+  "chunking_strategy": "markdown_headers",
+  "total_chunks": 1,
+  "chunks": [
+    {
+      "chunk_id": "b25773970ed3_0",
+      "source": "data/AGENTE_IA_MASTER_CONTEXT.md",
+      "source_path": "/home/ubuntu/mi-agente/data/AGENTE_IA_MASTER_CONTEXT.md",
+      "index": 0,
+      "tipo": "markdown_section",
+      "nombre": "AGENTE IA MASTER CONTEXT",
+      "start": null,
+      "end": null,
+      "start_line": 1,
+      "end_line": 17,
+      "content": "# AGENTE IA MASTER CONTEXT\n\nEste documento es la fuente oficial de verdad del proyecto Agente IA.\n\nEstado actual:\n- Agent Loop validado.\n- RAG V2 validado.\n- Ingesta documental validada.\n- Chunk Manager validado.\n- Retrieval Manager con BM25 + TF-IDF + Reranking validado.\n- Context Builder validado.\n- Agent Loop ejecutando RAG con PASS.\n- Self-Healing básico validado.\n- MultiAgent V2 básico validado.\n- Dashboard técnico operativo en construcción.\n- Docker levantado en puerto 8080.\n- Problema actual: imagen Docker antigua no refleja todavía los endpoints nuevos /api/status y /api/dashboard-summary por rebuild fallido por falta de espacio.",
+      "content_hash": "fbd4ec761c0d0ec4ba92b8a480a25c23ccafdaec913ac7e4895a1ab671c16a88",
+      "created_at": "2026-06-15T05:24:13.007555+00:00"
+    }
+  ]
+}

@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Agent Control Center</title>
+
+<style>
+:root{
+    --bg:#070b16;--panel:#0f172a;--panel2:#111c33;--border:#26364f;
+    --text:#e5e7eb;--muted:#94a3b8;--blue:#38bdf8;--green:#22c55e;
+    --yellow:#facc15;--red:#ef4444;--purple:#a78bfa;--cyan:#67e8f9;
+}
+*{box-sizing:border-box}
+body{
+    margin:0;
+    background:radial-gradient(circle at top left,rgba(56,189,248,.16),transparent 30%),
+    radial-gradient(circle at top right,rgba(167,139,250,.14),transparent 30%),var(--bg);
+    color:var(--text);
+    font-family:Inter,Segoe UI,Arial,sans-serif;
+}
+header{
+    padding:24px 32px;
+    background:rgba(2,6,23,.88);
+    border-bottom:1px solid var(--border);
+    position:sticky;
+    top:0;
+    z-index:10;
+    backdrop-filter:blur(12px);
+}
+.header-row{display:flex;justify-content:space-between;align-items:center;gap:20px}
+h1{margin:0;font-size:26px}
+.subtitle{margin-top:6px;color:var(--muted);font-size:13px}
+.pill{
+    padding:9px 15px;
+    border-radius:999px;
+    border:1px solid var(--border);
+    font-weight:900;
+    color:var(--green);
+    background:#020617;
+}
+.container{padding:24px 32px 45px;max-width:1650px;margin:auto}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:16px;margin-bottom:18px}
+.layout{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;margin-bottom:18px}
+@media(max-width:1050px){.layout{grid-template-columns:1fr}}
+.card{
+    background:linear-gradient(180deg,rgba(17,28,51,.97),rgba(15,23,42,.97));
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:18px;
+    box-shadow:0 18px 40px rgba(0,0,0,.35);
+}
+.card h2{
+    margin:0 0 13px;
+    color:var(--muted);
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:.8px;
+}
+.metric{font-size:27px;font-weight:900}
+.ok{color:var(--green)}.warn{color:var(--yellow)}.error{color:var(--red)}.info{color:var(--blue)}
+.executive{
+    display:grid;
+    grid-template-columns:1.2fr .8fr;
+    gap:18px;
+    margin-bottom:18px;
+}
+@media(max-width:1050px){.executive{grid-template-columns:1fr}}
+.executive-title{font-size:28px;font-weight:900;margin-bottom:8px}
+.executive-text{color:#cbd5e1;line-height:1.5;font-size:15px}
+.kpi-line{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:14px}
+.kpi{
+    background:#020617;
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:13px;
+}
+.kpi-label{font-size:12px;color:var(--muted);margin-bottom:5px}
+.kpi-value{font-size:22px;font-weight:900;color:var(--cyan)}
+textarea{
+    width:100%;
+    min-height:120px;
+    background:#020617;
+    color:var(--text);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:14px;
+    font-size:15px;
+    resize:vertical;
+    outline:none;
+}
+textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(56,189,248,.12)}
+button{
+    margin-top:12px;
+    width:100%;
+    border:0;
+    border-radius:14px;
+    padding:14px 18px;
+    background:linear-gradient(135deg,#0284c7,#7c3aed);
+    color:#fff;
+    font-weight:900;
+    cursor:pointer;
+}
+button:disabled{opacity:.45;cursor:not-allowed}
+.flow{
+    display:flex;
+    align-items:stretch;
+    gap:10px;
+    overflow-x:auto;
+    padding-bottom:8px;
+}
+.node{
+    min-width:260px;
+    background:#020617;
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:14px;
+    text-align:left;
+}
+.node-title{font-weight:900;font-size:15px}
+.node-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.node-state{
+    display:inline-block;
+    font-size:11px;
+    margin-top:8px;
+    padding:5px 8px;
+    border-radius:999px;
+    border:1px solid var(--border);
+}
+.node-section{
+    margin-top:11px;
+    border-top:1px solid var(--border);
+    padding-top:10px;
+}
+.node-label{font-size:10px;color:var(--muted);font-weight:900;letter-spacing:.7px;margin-top:8px}
+.node-value{font-size:12px;color:#e5e7eb;margin-top:3px;line-height:1.35}
+.node-process{color:#bae6fd}
+.node-output{color:#bbf7d0}
+.arrow{font-size:24px;color:var(--blue);font-weight:900;align-self:center}
+.processing{border-color:var(--blue);box-shadow:0 0 24px rgba(56,189,248,.3)}
+.completed{border-color:var(--green);box-shadow:0 0 20px rgba(34,197,94,.2)}
+.failed{border-color:var(--red);box-shadow:0 0 20px rgba(239,68,68,.25)}
+.tech-list,.doc-list,.arch-list{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:10px;
+}
+.tech,.doc,.arch{
+    background:#020617;
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:11px;
+    color:#cbd5e1;
+    font-size:13px;
+}
+.tech span,.doc span,.arch span{color:var(--green);font-weight:900}
+.roadmap-row{margin-bottom:11px}
+.roadmap-label{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+.bar{height:10px;background:#020617;border-radius:999px;overflow:hidden;border:1px solid var(--border)}
+.fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--purple));border-radius:999px}
+pre{
+    background:#020617;
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:15px;
+    white-space:pre-wrap;
+    overflow:auto;
+    max-height:340px;
+    color:#a7f3d0;
+    line-height:1.45;
+}
+.response-box{min-height:190px;color:#e0f2fe}
+.small{font-size:12px;color:var(--muted)}
+details{
+    background:#020617;
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:13px;
+}
+summary{
+    cursor:pointer;
+    color:var(--blue);
+    font-weight:900;
+}
+</style>
+</head>
+
+<body>
+<header>
+    <div class="header-row">
+        <div>
+            <h1>AI Agent Control Center</h1>
+            <div class="subtitle">Agente IA Autónomo · AWS EC2 · Docker · Flask · RAG · MCP · Telegram</div>
+        </div>
+        <div id="general_state" class="pill">Cargando...</div>
+    </div>
+</header>
+
+<div class="container">
+
+<div class="executive">
+    <div class="card">
+        <h2>Resumen Ejecutivo</h2>
+        <div class="executive-title" id="executive_status">Sistema en validación...</div>
+        <div class="executive-text" id="executive_summary">
+            El centro de operaciones está consultando el estado del agente, los módulos activos y la última ejecución.
+        </div>
+        <div class="kpi-line">
+            <div class="kpi"><div class="kpi-label">Estado General</div><div id="kpi_estado" class="kpi-value">...</div></div>
+            <div class="kpi"><div class="kpi-label">Documentos RAG</div><div id="kpi_docs" class="kpi-value">0</div></div>
+            <div class="kpi"><div class="kpi-label">Plugins</div><div id="kpi_plugins" class="kpi-value">0</div></div>
+            <div class="kpi"><div class="kpi-label">Ejecución</div><div id="kpi_exec" class="kpi-value">IDLE</div></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Arquitectura Operativa</h2>
+        <div class="arch-list">
+            <div class="arch"><span>●</span> Agent Loop</div>
+            <div class="arch"><span>●</span> RAG</div>
+            <div class="arch"><span>●</span> MCP</div>
+            <div class="arch"><span>●</span> Plugin Registry</div>
+            <div class="arch"><span>●</span> Memory Layer</div>
+            <div class="arch"><span>●</span> Goal Manager</div>
+            <div class="arch"><span>●</span> MultiAgent V2</div>
+            <div class="arch"><span>●</span> Self-Healing</div>
+        </div>
+    </div>
+</div>
+
+<div class="grid">
+    <div class="card"><h2>Agente</h2><div id="agent" class="metric warn">...</div></div>
+    <div class="card"><h2>Flask</h2><div id="flask" class="metric warn">...</div></div>
+    <div class="card"><h2>RAG</h2><div id="rag" class="metric warn">...</div></div>
+    <div class="card"><h2>Self-Healing</h2><div id="self_healing" class="metric warn">...</div></div>
+    <div class="card"><h2>MultiAgent</h2><div id="multi_agent" class="metric warn">...</div></div>
+    <div class="card"><h2>Telegram</h2><div id="telegram_bot" class="metric warn">...</div></div>
+</div>
+
+<div class="grid">
+    <div class="card"><h2>Chunks</h2><div id="chunks" class="metric info">0</div></div>
+    <div class="card"><h2>Metadata</h2><div id="metadata" class="metric info">0</div></div>
+    <div class="card"><h2>Plugins</h2><div id="plugins" class="metric info">0</div></div>
+    <div class="card"><h2>Historial</h2><div id="historial" class="metric warn">...</div></div>
+    <div class="card"><h2>Goals</h2><div id="goals" class="metric warn">...</div></div>
+</div>
+
+<div class="card">
+    <h2>Flujo LangGraph PM Copilot</h2>
+    <div class="flow" id="pm_flow"></div>
+</div>
+
+<div class="card">
+    <h2>Flujo de Procesamiento por Agente</h2>
+    <div class="flow" id="flow"></div>
+</div>
+
+<div class="layout">
+    <div class="card">
+        <h2>Consola de pruebas del agente</h2>
+        <textarea id="solicitud" placeholder="Ingresa una solicitud. Ejemplo: valida el estado del sistema y resume los componentes activos."></textarea>
+        <button id="btnRun" onclick="ejecutarSolicitud()">Ejecutar solicitud en el Agente IA</button>
+
+        <h2 style="margin-top:22px;">Resultado Ejecutivo</h2>
+        <pre id="respuesta_final" class="response-box">Esperando ejecución...</pre>
+    </div>
+
+    <div class="card">
+        <h2>Técnicas activas</h2>
+        <div class="tech-list">
+            <div class="tech"><span>✓</span> Agent Loop</div>
+            <div class="tech"><span>✓</span> RAG</div>
+            <div class="tech"><span>✓</span> Chunking</div>
+            <div class="tech"><span>✓</span> BM25</div>
+            <div class="tech"><span>✓</span> TF-IDF</div>
+            <div class="tech"><span>✓</span> Reranking</div>
+            <div class="tech"><span>✓</span> MCP</div>
+            <div class="tech"><span>✓</span> Plugin Registry</div>
+            <div class="tech"><span>✓</span> Memory Layer</div>
+            <div class="tech"><span>✓</span> Goal Manager</div>
+            <div class="tech"><span>✓</span> MultiAgent V2</div>
+            <div class="tech"><span>✓</span> Self-Healing</div>
+        </div>
+    </div>
+</div>
+
+<div class="layout">
+    <div class="card">
+        <h2>Ingesta documental Markdown / Código / JSON</h2>
+        <div class="doc-list">
+            <div class="doc"><span>✓</span> AGENTE_IA_MASTER_CONTEXT.md</div>
+            <div class="doc"><span>✓</span> arquitectura_agente.md</div>
+            <div class="doc"><span>✓</span> historial.json</div>
+            <div class="doc"><span>✓</span> app.py</div>
+            <div class="doc"><span>✓</span> mcp_client.py</div>
+        </div>
+        <p class="small">La ingesta alimenta el RAG mediante chunks, metadata y recuperación contextual.</p>
+    </div>
+
+    <div class="card">
+        <h2>Madurez del Bot IA hacia Agente Autónomo</h2>
+        <div id="roadmap"></div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Detalle Técnico Avanzado</h2>
+    <details>
+        <summary>Ver estado interno /api/agent-state</summary>
+        <pre id="agent_raw">Cargando...</pre>
+    </details>
+    <br>
+    <details>
+        <summary>Ver resumen técnico del Dashboard</summary>
+        <pre id="summary_raw">Cargando...</pre>
+    </details>
+</div>
+
+</div>
+
+<script>
+const pmFlowMap = [
+    ["intake","Intake","Entrada"],
+    ["document_agent","Document Agent","OCR / Documento"],
+    ["critic","Critic","Validación"],
+    ["delivery","Delivery","Entrega"]
+];
+
+function renderPMFlow(pmFlow){
+    const el=document.getElementById("pm_flow");
+    if(!el) return;
+
+    el.innerHTML="";
+    const nodes=pmFlow.nodes || {};
+
+    pmFlowMap.forEach((f,i)=>{
+        const data=nodes[f[0]] || {estado:"WAITING", detalle:"En espera", titulo:f[1]};
+
+        let stateClass =
+            data.estado==="COMPLETED" ? "completed" :
+            data.estado==="PROCESSING" ? "processing" :
+            data.estado==="ERROR" ? "failed" : "";
+
+        el.innerHTML+=`
+        <div class="node ${stateClass}">
+            <div class="node-title">${f[1]}</div>
+            <div class="node-sub">${f[2]}</div>
+            <div class="node-state">${data.estado}</div>
+            <div class="node-section">
+                <div class="node-label">DETALLE</div>
+                <div class="node-value">${safeText(data.detalle,"En espera")}</div>
+            </div>
+        </div>`;
+
+        if(i < pmFlowMap.length-1) el.innerHTML+=`<div class="arrow">→</div>`;
+    });
+}
+
+const flowMap = [
+    ["input","Agente 1","Recepción de Solicitud"],
+    ["rag_context","Agente 2","Contexto Inteligente RAG"],
+    ["planner","Agente 3","Planificación"],
+    ["multi_agent","Agente 4","Orquestación"],
+    ["self_healing","Agente 5","Autocuración"],
+    ["respuesta","Agente 6","Respuesta Final"]
+];
+
+const roadmap = [
+    ["Agent Loop",100],
+    ["RAG",100],
+    ["Reasoning / CoT",70],
+    ["Planner",60],
+    ["Task Decomposer",40],
+    ["Critic",20],
+    ["Reflection",20],
+    ["Multi-Agent",80],
+    ["Memory Intelligence",70],
+    ["Self-Healing",80],
+    ["Autonomous Agent",50]
+];
+
+function cls(v){
+    if(["ONLINE","ACTIVE","BASIC_ACTIVE","SI","COMPLETED"].includes(v)) return "ok";
+    if(v==="PROCESSING") return "info";
+    if(["ERROR","NO"].includes(v)) return "error";
+    return "warn";
+}
+
+function setMetric(id,value){
+    const el=document.getElementById(id);
+    el.innerText=value;
+    el.className="metric "+cls(value);
+}
+
+function renderRoadmap(){
+    const el=document.getElementById("roadmap");
+    el.innerHTML="";
+    roadmap.forEach(([name,p])=>{
+        el.innerHTML+=`
+        <div class="roadmap-row">
+            <div class="roadmap-label"><span>${name}</span><span>${p}%</span></div>
+            <div class="bar"><div class="fill" style="width:${p}%"></div></div>
+        </div>`;
+    });
+}
+
+function safeText(value, fallback){
+    if(!value || value === "") return fallback;
+    return String(value).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+}
+
+function renderFlow(agentes){
+    const el=document.getElementById("flow");
+    el.innerHTML="";
+
+    flowMap.forEach((f,i)=>{
+        const data=agentes[f[0]] || {
+            estado:"WAITING",
+            detalle:"En espera",
+            entrada:"",
+            proceso:"",
+            salida:""
+        };
+
+        let stateClass =
+            data.estado==="COMPLETED" ? "completed" :
+            data.estado==="PROCESSING" ? "processing" :
+            data.estado==="ERROR" ? "failed" : "";
+
+        const entrada=safeText(data.entrada,"Pendiente de entrada");
+        const proceso=safeText(data.proceso || data.detalle,"Pendiente de proceso");
+        const salida=safeText(data.salida,"Pendiente de salida");
+
+        el.innerHTML+=`
+        <div class="node ${stateClass}">
+            <div class="node-title">${f[1]}</div>
+            <div class="node-sub">${f[2]}</div>
+            <div class="node-state">${data.estado}</div>
+
+            <div class="node-section">
+                <div class="node-label">ENTRADA</div>
+                <div class="node-value">${entrada}</div>
+
+                <div class="node-label">PROCESO</div>
+                <div class="node-value node-process">${proceso}</div>
+
+                <div class="node-label">SALIDA</div>
+                <div class="node-value node-output">${salida}</div>
+            </div>
+        </div>`;
+
+        if(i < flowMap.length-1) el.innerHTML+=`<div class="arrow">→</div>`;
+    });
+}
+
+function buildExecutiveResult(agentState, summary){
+    if(agentState.estado_general === "PROCESSING"){
+        return "La solicitud está siendo procesada por el pipeline de agentes.\n\n" +
+        "Estado: EN PROCESO\n" +
+        "Solicitud: " + (agentState.solicitud_actual || "N/D");
+    }
+
+    if(agentState.estado_general === "ERROR"){
+        return "Estado: ERROR\n\n" + (agentState.error || "Se detectó un error durante la ejecución.");
+    }
+
+    if(agentState.estado_general === "COMPLETED"){
+        return "Estado: COMPLETADO\n\n" +
+        "La solicitud fue procesada correctamente por el flujo del agente.\n\n" +
+        "Resumen operativo:\n" +
+        "• Chunks disponibles: " + (summary.chunks ?? 0) + "\n" +
+        "• Metadata disponible: " + (summary.metadata ?? 0) + "\n" +
+        "• Plugins detectados: " + (summary.plugins ?? 0) + "\n" +
+        "• Historial: " + (summary.historial_existe ? "Disponible" : "No disponible") + "\n" +
+        "• Goals: " + (summary.goals_existe ? "Disponible" : "No disponible") + "\n" +
+        "• Self-Healing: Validado en el flujo\n\n" +
+        "Detalle del agente:\n" +
+        (agentState.respuesta_final || "Sin detalle adicional.");
+    }
+
+    return "Esperando ejecución...";
+}
+
+async function cargarDashboard(){
+    try{
+        const status=await (await fetch("/api/status")).json();
+        const summary=await (await fetch("/api/dashboard-summary")).json();
+        const agentState=await (await fetch("/api/agent-state")).json();
+        const pmFlow=await (await fetch("/api/pm-flow")).json();
+
+        setMetric("agent",status.agent||"N/D");
+        setMetric("flask",status.flask||"N/D");
+        setMetric("rag",status.rag||"N/D");
+        setMetric("self_healing",status.self_healing||"N/D");
+        setMetric("multi_agent",status.multi_agent||"N/D");
+        setMetric("telegram_bot",status.telegram_bot||"N/D");
+
+        document.getElementById("chunks").innerText=summary.chunks??0;
+        document.getElementById("metadata").innerText=summary.metadata??0;
+        document.getElementById("plugins").innerText=summary.plugins??0;
+
+        setMetric("historial",summary.historial_existe?"SI":"NO");
+        setMetric("goals",summary.goals_existe?"SI":"NO");
+
+        const general=document.getElementById("general_state");
+        general.innerText=agentState.estado_general||"N/D";
+        general.className="pill "+cls(agentState.estado_general);
+
+        document.getElementById("kpi_estado").innerText=agentState.estado_general || "N/D";
+        document.getElementById("kpi_docs").innerText=summary.metadata ?? 0;
+        document.getElementById("kpi_plugins").innerText=summary.plugins ?? 0;
+        document.getElementById("kpi_exec").innerText=agentState.estado_general || "IDLE";
+
+        document.getElementById("executive_status").innerText =
+            agentState.estado_general === "COMPLETED" ? "Agente Operativo" :
+            agentState.estado_general === "PROCESSING" ? "Agente Procesando Solicitud" :
+            agentState.estado_general === "ERROR" ? "Agente con Error" :
+            "Agente en Espera";
+
+        document.getElementById("executive_summary").innerText =
+            "El sistema integra Agent Loop, RAG, MCP, plugins, memoria, objetivos, MultiAgent y Self-Healing para procesar solicitudes desde Telegram o Dashboard.";
+
+        renderFlow(agentState.agentes||{});
+        renderPMFlow(pmFlow);
+
+        document.getElementById("respuesta_final").innerText = buildExecutiveResult(agentState, summary);
+        document.getElementById("agent_raw").innerText=JSON.stringify(agentState,null,2);
+        document.getElementById("summary_raw").innerText=JSON.stringify(summary,null,2);
+
+        document.getElementById("btnRun").disabled=agentState.estado_general==="PROCESSING";
+    }catch(e){
+        document.getElementById("agent_raw").innerText="Error cargando dashboard: "+e;
+    }
+}
+
+async function ejecutarSolicitud(){
+    const solicitud=document.getElementById("solicitud").value.trim();
+    if(!solicitud){ alert("Ingrese una solicitud para el agente."); return; }
+
+    document.getElementById("btnRun").disabled=true;
+    document.getElementById("respuesta_final").innerText="Solicitud enviada. Procesando...";
+
+    const res=await fetch("/api/agent-run",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({solicitud})
+    });
+
+    const data=await res.json();
+    if(!data.ok){
+        document.getElementById("respuesta_final").innerText=data.error || "Error enviando solicitud.";
+    }
+
+    setTimeout(cargarDashboard,500);
+}
+
+renderRoadmap();
+cargarDashboard();
+setInterval(cargarDashboard,2000);
+</script>
+</body>
+</html>
+EOF
+

@@ -1,0 +1,68 @@
+{
+  "ok": true,
+  "source": "mcp_client.py",
+  "chunking_strategy": "python_ast",
+  "total_chunks": 4,
+  "chunks": [
+    {
+      "chunk_id": "72ca3f07daf8_0",
+      "source": "mcp_client.py",
+      "source_path": "/home/ubuntu/mi-agente/mcp_client.py",
+      "index": 0,
+      "tipo": "module_preamble",
+      "nombre": "imports_config",
+      "start": null,
+      "end": null,
+      "start_line": 1,
+      "end_line": 14,
+      "content": "\"\"\"\nmcp_client.py — Executor oficial del agente.\n\nResponsabilidad:\n- Recibir una acción.\n- Validar el plugin.\n- Ejecutar el plugin mediante plugin_registry.\n- Devolver una respuesta estándar al agent_loop.py.\n\"\"\"\n\nimport json\nfrom plugin_registry import run_plugin, validate_plugin, list_plugins",
+      "content_hash": "b12b2b8bc59bfb26aa4e18464b3334f676251e177472ab45b3ba8aa7980c4c61",
+      "created_at": "2026-06-13T23:38:46.670875+00:00"
+    },
+    {
+      "chunk_id": "72ca3f07daf8_1",
+      "source": "mcp_client.py",
+      "source_path": "/home/ubuntu/mi-agente/mcp_client.py",
+      "index": 1,
+      "tipo": "function",
+      "nombre": "ejecutar_accion",
+      "start": null,
+      "end": null,
+      "start_line": 15,
+      "end_line": 40,
+      "content": "def ejecutar_accion(nombre_plugin: str, params=None) -> dict:\n    \"\"\"\n    Ejecuta un plugin/skill a través del registry.\n    \"\"\"\n    params = params or {}\n\n    validacion = validate_plugin(nombre_plugin)\n\n    if not validacion.get(\"ok\"):\n        return {\n            \"ok\": False,\n            \"plugin\": nombre_plugin,\n            \"params\": params,\n            \"resultado\": \"\",\n            \"error\": validacion.get(\"error\", \"Plugin inválido\")\n        }\n\n    resultado = run_plugin(nombre_plugin, params)\n\n    return {\n        \"ok\": resultado.get(\"ok\", False),\n        \"plugin\": nombre_plugin,\n        \"params\": params,\n        \"resultado\": resultado.get(\"result\", \"\"),\n        \"error\": resultado.get(\"error\", \"\")\n    }",
+      "content_hash": "3ce914bfcbe10dcc38eddf8518841f87cff31dbef93d5bdf8888d7cd0d71cde4",
+      "created_at": "2026-06-13T23:38:46.670913+00:00"
+    },
+    {
+      "chunk_id": "72ca3f07daf8_2",
+      "source": "mcp_client.py",
+      "source_path": "/home/ubuntu/mi-agente/mcp_client.py",
+      "index": 2,
+      "tipo": "function",
+      "nombre": "listar_acciones_disponibles",
+      "start": null,
+      "end": null,
+      "start_line": 43,
+      "end_line": 50,
+      "content": "def listar_acciones_disponibles() -> dict:\n    \"\"\"\n    Lista plugins y skills detectados por el registry.\n    \"\"\"\n    return {\n        \"ok\": True,\n        \"acciones\": list_plugins()\n    }",
+      "content_hash": "fabd65622a3aefdb2eef286cecd229b02f7d0549b1c1ac469a64831b6e418f7c",
+      "created_at": "2026-06-13T23:38:46.670922+00:00"
+    },
+    {
+      "chunk_id": "72ca3f07daf8_3",
+      "source": "mcp_client.py",
+      "source_path": "/home/ubuntu/mi-agente/mcp_client.py",
+      "index": 3,
+      "tipo": "function",
+      "nombre": "ejecutar_desde_texto",
+      "start": null,
+      "end": null,
+      "start_line": 53,
+      "end_line": 91,
+      "content": "def ejecutar_desde_texto(texto: str) -> dict:\n    \"\"\"\n    Selector simple por reglas.\n    Más adelante será reemplazado por planner.py.\n    \"\"\"\n    texto_lower = texto.lower().strip()\n\n    # Chunks / memoria documental\n    if \"listar chunks\" in texto_lower or \"ver chunks\" in texto_lower or \"chunks\" in texto_lower:\n        return ejecutar_accion(\"listar_chunks\", {})\n\n    # Alertas / Telegram\n    if \"alerta\" in texto_lower or \"telegram\" in texto_lower:\n        return ejecutar_accion(\"enviar_alerta\", {\"mensaje\": texto})\n\n    # Lectura de configuración / archivos específicos\n    if \"config\" in texto_lower:\n        return ejecutar_accion(\"leer_archivo_definitivo\", {\"nombre\": \"config.json\"})\n\n    # Mapa o exploración amplia del sistema\n    if \"mapa\" in texto_lower or \"sistema\" in texto_lower:\n        return ejecutar_accion(\"mapa_total\", {})\n\n    # Listado general de archivos\n    if \"listar\" in texto_lower or \"archivos\" in texto_lower:\n        return ejecutar_accion(\"listar_contenido_real\", {})\n\n    # Lectura genérica de archivo\n    if \"archivo\" in texto_lower:\n        return ejecutar_accion(\"leer_archivo_definitivo\", {\"nombre\": \"config.json\"})\n\n    return {\n        \"ok\": False,\n        \"plugin\": \"\",\n        \"params\": {},\n        \"resultado\": \"\",\n        \"error\": \"No se encontró una acción adecuada para el texto recibido.\",\n        \"texto\": texto\n    }",
+      "content_hash": "8113faaf0d89ae1b8259e744523b2c0cfaaccd38816f3a9f04db48b10a6877d4",
+      "created_at": "2026-06-13T23:38:46.670936+00:00"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "total_eventos": 3,
+  "por_tipo": {
+    "test": 1,
+    "orchestrator": 2
+  },
+  "ultimos_eventos": [
+    {
+      "id": "0085c762-cfde-493f-adc9-40b126d67c31",
+      "fecha": "2026-06-14T07:43:15.746630+00:00",
+      "tipo": "orchestrator",
+      "objetivo": "crear un plugin para leer logs del sistema",
+      "estado": "COMPLETADO"
+    },
+    {
+      "id": "7b1e874a-b616-4080-8f29-92e16a8a4a0a",
+      "fecha": "2026-06-14T07:15:19.457793+00:00",
+      "tipo": "orchestrator",
+      "objetivo": "crear un plugin para leer logs del sistema",
+      "estado": "COMPLETADO"
+    },
+    {
+      "id": "2157cebb-3b62-4a8f-8832-12d3575036d1",
+      "fecha": "2026-06-14T06:39:49.774615+00:00",
+      "tipo": "test",
+      "objetivo": "probar memoria",
+      "estado": "COMPLETADO"
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+from flask import Flask, render_template_string, request, jsonify, send_from_directory
+import asyncio, edge_tts, os, datetime, pytz
+
+app = Flask(__name__)
+
+# Asegurar carpeta de audio
+if not os.path.exists('audio'):
+    os.makedirs('audio', exist_ok=True)
+
+# Función de gestión temporal exacta (Guayaquil)
+def get_tiempo():
+    tz = pytz.timezone('America/Guayaquil')
+    ahora = datetime.datetime.now(tz)
+    return ahora.strftime("%d/%m/%Y"), ahora.strftime("%H:%M")
+
+@app.route('/')
+def index():
+    return render_template_string("""
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <title>Mi Agente AI</title>
+        <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #e5ddd5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+            .chat-box { background: white; width: 400px; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+            h2 { text-align: center; color: #333; margin-top: 0; }
+            #chat { background: #f9f9f9; padding: 15px; border-radius: 8px; min-height: 100px; margin-bottom: 15px; border: 1px solid #ddd; overflow-y: auto; }
+            .input-area { display: flex; gap: 5px; }
+            input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; outline: none; }
+            button { padding: 10px 15px; background: #25d366; color: white; border: none; border-radius: 5px; cursor: pointer; }
+            button:hover { background: #128c7e; }
+            audio { width: 100%; margin-top: 10px; }
+        </style>
+    </head>
+    <body>
+        <div class="chat-box">
+            <h2>Asistente Pro</h2>
+            <div id="chat">Escribe algo para empezar...</div>
+            <div class="input-area">
+                <input type="text" id="in" placeholder="Escribe un mensaje..." onkeypress="if(event.key==='Enter') enviar()">
+                <button onclick="enviar()">Enviar</button>
+            </div>
+            <audio id="player" controls></audio>
+        </div>
+        <script>
+            function enviar() {
+                let input = document.getElementById('in');
+                let msg = input.value;
+                if (!msg) return;
+                document.getElementById('chat').innerHTML = '<b>Tú:</b> ' + msg;
+                fetch('/chat', {
+                    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({msg:msg})
+                }).then(r=>r.json()).then(d => {
+                    document.getElementById('chat').innerHTML += '<br><b>Agente:</b> ' + d.response;
+                    let p = document.getElementById('player');
+                    p.src = '/audio/resp.mp3?t=' + new Date().getTime();
+                    p.play();
+                    input.value = '';
+                });
+            }
+        </script>
+    </body>
+    </html>
+    """)
+
+@app.route('/audio/<path:filename>')
+def serve_audio(filename):
+    return send_from_directory('audio', filename)
+
+@app.route('/chat', methods=['POST'])
+def chat():
+    texto = request.json.get('msg', '').lower()
+    fecha, hora = get_tiempo()
+    
+    # Lógica de respuesta base
+    if "fecha" in texto:
+        respuesta = f"Hoy es {fecha}."
+    elif "hora" in texto:
+        respuesta = f"La hora actual en Guayaquil es {hora}."
+    else:
+        respuesta = "He recibido tu mensaje: " + texto
+
+    # Generación de voz
+    try:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(edge_tts.Communicate(respuesta, "es-ES-ElviraNeural").save("audio/resp.mp3"))
+    except Exception as e:
+        print(f"Error generando audio: {e}")
+        
+    return jsonify({"response": respuesta})
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)

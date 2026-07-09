@@ -1,0 +1,1 @@
+funciona con la tecnología Scrapy

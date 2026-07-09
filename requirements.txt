@@ -1,0 +1,17 @@
+flask
+groq
+ddgs
+tavily-python
+pandas
+pyTelegramBotAPI
+beautifulsoup4
+pytz
+requests
+python-dotenv
+lxml[html_clean]
+pypdf
+python-docx
+pytesseract
+pdf2image
+Pillow
+langgraph

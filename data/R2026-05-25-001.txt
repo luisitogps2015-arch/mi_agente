@@ -1,0 +1,3 @@
+Solicitante: Ma. Amat
+Requerimiento: Cambio de rol en sistema SIC para Analista de Facturación y Cobranza
+Objetivo: Permitir asignación de nuevos clientes a los usuarios Annabell y Richard

@@ -1,0 +1,1 @@
+return {'estado': 'activo', 'valor': 100}

@@ -1,0 +1,9 @@
+{
+  "nombre": "AGENTE_IA_MASTER_CONTEXT.md",
+  "ruta": "data/AGENTE_IA_MASTER_CONTEXT.md",
+  "fecha_ingesta": "2026-06-15T05:24:13.009455",
+  "estado": "INGESTADO",
+  "chunking_strategy": "markdown_headers",
+  "total_chunks": 1,
+  "chunks_file": "/home/ubuntu/mi-agente/data/chunks/b25773970ed3_AGENTE_IA_MASTER_CONTEXT.md.chunks.json"
+}

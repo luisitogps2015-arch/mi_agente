@@ -1,0 +1,1 @@
+def run(p): try: return 10 / p except ZeroDivisionError: return 'Error: División por cero'

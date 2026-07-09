@@ -1,0 +1,19 @@
+{
+  "mcpVersion": "1.0.0",
+  "name": "plugin-prueba",
+  "tools": [
+    {
+      "name": "saludar",
+      "description": "Devuelve un saludo personalizado",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "type": "string"
+          }
+        },
+        "required": ["nombre"]
+      }
+    }
+  ]
+}

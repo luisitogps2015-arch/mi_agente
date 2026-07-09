@@ -1,0 +1,17 @@
+{
+  "id": "proyecto_002",
+  "nombre": "Proyecto de Prueba PM",
+  "descripcion": "Validación inicial del PM Copilot",
+  "estado": "ACTIVO",
+  "fecha_creacion": "2026-06-17T00:10:49.489866Z",
+  "estructura": [
+    "actas",
+    "minutas",
+    "backlog",
+    "informes",
+    "riesgos",
+    "roadmap",
+    "documentos",
+    "memoria"
+  ]
+}

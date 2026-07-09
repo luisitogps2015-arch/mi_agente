@@ -1,0 +1,9 @@
+{
+  "nombre": "arquitectura_agente.md",
+  "ruta": "data/arquitectura_agente.md",
+  "fecha_ingesta": "2026-06-14T23:15:19.133007",
+  "estado": "INGESTADO",
+  "chunking_strategy": "markdown_headers",
+  "total_chunks": 6,
+  "chunks_file": "/home/ubuntu/mi-agente/data/chunks/b2e1ea26d8cc_arquitectura_agente.md.chunks.json"
+}

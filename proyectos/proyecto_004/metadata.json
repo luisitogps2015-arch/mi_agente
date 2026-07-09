@@ -1,0 +1,17 @@
+{
+  "id": "proyecto_004",
+  "nombre": "Proyecto Demo",
+  "descripcion": "Proyecto creado desde Telegram/Dashboard mediante PM Copilot",
+  "estado": "ACTIVO",
+  "fecha_creacion": "2026-06-17T00:20:41.436762Z",
+  "estructura": [
+    "actas",
+    "minutas",
+    "backlog",
+    "informes",
+    "riesgos",
+    "roadmap",
+    "documentos",
+    "memoria"
+  ]
+}
