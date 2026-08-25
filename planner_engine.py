@@ -6,7 +6,7 @@ from rag_engine import responder_con_rag
 
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-MODELO_PLANNER = "llama-3.1-8b-instant"
+MODELO_PLANNER = "openai/gpt-oss-20b"
 
 client = Groq(api_key=GROQ_API_KEY)
 

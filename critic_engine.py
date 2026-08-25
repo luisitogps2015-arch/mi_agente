@@ -6,7 +6,7 @@ from executor_engine import ejecutar_plan
 
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-MODELO_CRITIC = "llama-3.1-8b-instant"
+MODELO_CRITIC = "openai/gpt-oss-20b"
 
 client = Groq(api_key=GROQ_API_KEY)
 

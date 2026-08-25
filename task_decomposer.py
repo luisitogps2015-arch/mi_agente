@@ -7,7 +7,7 @@ from planner_engine import crear_plan
 
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-MODELO_DECOMPOSER = "llama-3.1-8b-instant"
+MODELO_DECOMPOSER = "openai/gpt-oss-20b"
 
 client = Groq(api_key=GROQ_API_KEY)
 

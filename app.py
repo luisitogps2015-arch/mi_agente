@@ -1,4 +1,4 @@
-import threading, time, logging, os, json
+import threading, time, logging, os, json, hmac
 from datetime import datetime
 
 from dotenv import load_dotenv
@@ -9,6 +9,23 @@ import telebot
 from groq import Groq
 from herramientas import TELEGRAM_TOKEN, CHAT_ID, buscar_en_web_real
 from mcp_server import procesar_agente
+from crew_core.ingestion import (
+    API_SOURCES,
+    DEFAULT_SOURCE,
+    INGESTION_TTL_SECONDS,
+    IngestionError,
+    IngestionTimeoutError,
+    fetch_api_source,
+    ingestion_registry,
+)
+from crew_core.run_service import (
+    MAX_TOPIC_LENGTH,
+    CrewRunBusyError,
+    CrewRunRateLimitError,
+    crew_run_registry,
+    crew_run_rate_limiter,
+    validate_input_data,
+)
 
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -30,6 +47,28 @@ os.makedirs(
 
 
 SALUDOS = {"hola", "hi", "buenas", "buenos dias", "buenas tardes", "saludos"}
+
+
+def _crew_auth_error():
+    """Devuelve una respuesta segura cuando falla el token del dashboard."""
+    expected = os.getenv("CREW_DASHBOARD_TOKEN", "")
+    if not expected:
+        return jsonify({"error": "Protección Crew no configurada."}), 503
+
+    authorization = request.headers.get("Authorization", "")
+    scheme, separator, supplied = authorization.partition(" ")
+    valid = (
+        separator == " "
+        and scheme.lower() == "bearer"
+        and bool(supplied)
+        and hmac.compare_digest(supplied, expected)
+    )
+    if valid:
+        return None
+
+    response = jsonify({"error": "No autorizado."})
+    response.headers["WWW-Authenticate"] = "Bearer"
+    return response, 401
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
@@ -441,7 +480,7 @@ def ciclo_noticias():
 
             if texto and "Error" not in texto:
                 resp = groq_client.chat.completions.create(
-                    model="llama-3.1-8b-instant",
+                    model="openai/gpt-oss-20b",
                     messages=[
                         {
                             "role": "user",
@@ -649,6 +688,131 @@ def api_status():
         "self_healing": "BASIC_ACTIVE",
         "memory": "BASIC_ACTIVE"
     })
+
+
+@app.route("/api/crew/run", methods=["POST"])
+def api_crew_run():
+    if auth_error := _crew_auth_error():
+        return auth_error
+    if not request.is_json:
+        return jsonify({"error": "Content-Type debe ser application/json."}), 400
+
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"error": "JSON inválido."}), 400
+
+    topic = data.get("topic")
+    if not isinstance(topic, str):
+        return jsonify({"error": "topic es obligatorio y debe ser string."}), 400
+    if not topic.strip():
+        return jsonify({"error": "topic no puede estar vacío."}), 400
+    if len(topic) > MAX_TOPIC_LENGTH:
+        return jsonify({"error": f"topic excede {MAX_TOPIC_LENGTH} caracteres."}), 400
+
+    ingestion_id = data.get("ingestion_id")
+    source_type = data.get("source_type", "api" if ingestion_id else "manual")
+    if source_type not in {"manual", "api"}:
+        return jsonify({"error": "source_type debe ser manual o api."}), 400
+
+    if source_type == "api":
+        if "input_data" in data:
+            return jsonify({
+                "error": "input_data no se acepta para una fuente API."
+            }), 400
+        if not isinstance(ingestion_id, str) or not ingestion_id:
+            return jsonify({"error": "ingestion_id válido es obligatorio."}), 400
+        ingestion = ingestion_registry.get(ingestion_id)
+        if ingestion is None:
+            return jsonify({"error": "ingestion_id inválido o expirado."}), 400
+        input_data = ingestion["data"]
+        source_name = ingestion["source_name"]
+    else:
+        if ingestion_id is not None:
+            return jsonify({
+                "error": "ingestion_id solo es válido para una fuente API."
+            }), 400
+        input_data = data.get("input_data")
+        source_name = None
+
+    if input_data is not None:
+        try:
+            validate_input_data(input_data)
+        except ValueError as exc:
+            return jsonify({"error": str(exc)}), 400
+
+    try:
+        run = crew_run_registry.start(
+            topic,
+            input_data=input_data,
+            source_type=source_type,
+            source_name=source_name,
+            rate_limiter=crew_run_rate_limiter,
+        )
+    except CrewRunBusyError:
+        return jsonify({"error": "BUSY", "status": "BUSY"}), 409
+    except CrewRunRateLimitError as exc:
+        response = jsonify({
+            "error": "RATE_LIMITED",
+            "status": "RATE_LIMITED",
+            "retry_after": exc.retry_after,
+        })
+        response.headers["Retry-After"] = str(exc.retry_after)
+        return response, 429
+
+    return jsonify({
+        "run_id": run["run_id"],
+        "status": run["status"],
+        "status_url": f"/api/crew/status/{run['run_id']}",
+        "source_type": run["source_type"],
+        "source_name": run["source_name"],
+    }), 202
+
+
+@app.route("/api/ingestion/api", methods=["POST"])
+def api_ingestion_api():
+    if auth_error := _crew_auth_error():
+        return auth_error
+    if not request.is_json:
+        return jsonify({"error": "Content-Type debe ser application/json."}), 400
+
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"error": "JSON inválido."}), 400
+    source = data.get("source", DEFAULT_SOURCE)
+    if not isinstance(source, str):
+        return jsonify({"error": "source debe ser string."}), 400
+    if source not in API_SOURCES:
+        return jsonify({"error": "Fuente API no permitida."}), 400
+
+    try:
+        result = fetch_api_source(source)
+    except IngestionTimeoutError as exc:
+        return jsonify({"error": str(exc), "status": "ERROR"}), 504
+    except IngestionError as exc:
+        return jsonify({"error": str(exc), "status": "ERROR"}), 502
+    record = ingestion_registry.store(
+        source=result["source"],
+        source_name=result["source_name"],
+        data=result["data"],
+    )
+    return jsonify({
+        "ingestion_id": record["ingestion_id"],
+        "source": result["source"],
+        "source_name": result["source_name"],
+        "status": result["status"],
+        "preview": result["preview"],
+        "expires_in": INGESTION_TTL_SECONDS,
+    }), 200
+
+
+@app.route("/api/crew/status/<run_id>")
+def api_crew_status(run_id):
+    if auth_error := _crew_auth_error():
+        return auth_error
+    run = crew_run_registry.get(run_id)
+    if run is None:
+        return jsonify({"error": "Run no encontrado."}), 404
+    return jsonify(run), 200
 
 
 @app.route("/api/agent-state")

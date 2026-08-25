@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Agent Control Center</title>
+<title>AI Multi-Agent Platform</title>
 
 <style>
 :root{
@@ -90,6 +90,11 @@ textarea{
     outline:none;
 }
 textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(56,189,248,.12)}
+input[type="password"]{
+    width:100%;background:#020617;color:var(--text);border:1px solid var(--border);
+    border-radius:11px;padding:11px 12px;outline:none;
+}
+input[type="password"]:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(56,189,248,.12)}
 button{
     margin-top:12px;
     width:100%;
@@ -182,6 +187,89 @@ summary{
     color:var(--blue);
     font-weight:900;
 }
+.crew-shell{margin-bottom:24px}
+.crew-hero{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:24px;
+    margin-bottom:18px;
+}
+.crew-eyebrow{color:var(--blue);font-size:12px;font-weight:900;letter-spacing:1.4px}
+.crew-title{margin:7px 0 5px;font-size:clamp(25px,4vw,38px);line-height:1.1}
+.crew-subtitle{color:var(--muted);font-size:15px}
+.crew-meta{display:grid;gap:8px;min-width:min(100%,330px)}
+.crew-meta-row{
+    display:grid;
+    grid-template-columns:80px 1fr;
+    gap:10px;
+    padding:9px 12px;
+    background:#020617;
+    border:1px solid var(--border);
+    border-radius:11px;
+    font-size:12px;
+}
+.crew-meta-label{color:var(--muted);font-weight:800;text-transform:uppercase}
+.crew-meta-value{overflow-wrap:anywhere;color:#dbeafe}
+.crew-control-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(280px,.75fr);gap:18px}
+.crew-field-label{display:block;font-size:13px;font-weight:800;margin-bottom:9px;color:#dbeafe}
+.crew-help{display:flex;justify-content:space-between;gap:12px;margin-top:7px;color:var(--muted);font-size:12px}
+.crew-source-toggle{display:flex;gap:8px;margin:8px 0 14px}
+.crew-source-toggle button{margin:0;padding:9px 16px;background:#0f172a;color:var(--muted);border:1px solid var(--border)}
+.crew-source-toggle button.is-selected{color:#e0f2fe;border-color:var(--blue);background:rgba(14,165,233,.16)}
+.crew-api-panel{display:none;margin:0 0 14px;padding:12px;border:1px solid var(--border);border-radius:12px;background:#020617}
+.crew-api-panel.is-visible{display:block}
+.crew-api-panel button{margin:8px 0;padding:9px 14px}
+.crew-api-preview{min-height:72px;max-height:180px;margin:7px 0 0;font-size:12px;color:#bae6fd}
+.crew-token-row{display:grid;grid-template-columns:minmax(0,1fr) 110px;gap:8px;margin-bottom:14px}
+.crew-token-row button{margin:0;padding:10px}
+.crew-feedback{min-height:20px;margin-top:10px;color:var(--muted);font-size:13px}
+.crew-feedback.is-error{color:#fecaca}.crew-feedback.is-active{color:#bae6fd}
+.crew-summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.crew-summary-box{padding:14px;background:#020617;border:1px solid var(--border);border-radius:14px}
+.crew-summary-label{font-size:11px;color:var(--muted);letter-spacing:.8px;font-weight:900}
+.crew-summary-value{margin-top:7px;font-size:18px;font-weight:900;overflow-wrap:anywhere}
+.crew-flow{display:grid;grid-template-columns:minmax(0,1fr) 42px minmax(0,1fr) 42px minmax(0,1fr);align-items:stretch;margin-top:18px}
+.crew-agent{
+    min-width:0;
+    background:linear-gradient(180deg,rgba(8,17,34,.98),rgba(2,6,23,.98));
+    border:1px solid var(--border);
+    border-radius:17px;
+    padding:18px;
+    transition:border-color .2s ease,box-shadow .2s ease;
+}
+.crew-agent[data-status="RUNNING"]{border-color:var(--blue);box-shadow:0 0 25px rgba(56,189,248,.16)}
+.crew-agent[data-status="DONE"]{border-color:rgba(34,197,94,.75)}
+.crew-agent[data-status="ERROR"]{border-color:rgba(239,68,68,.85)}
+.crew-agent-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.crew-agent-name{font-size:17px;font-weight:900;letter-spacing:.6px}
+.crew-agent-role{margin-top:5px;color:var(--muted);font-size:13px;line-height:1.45}
+.crew-badge{display:inline-flex;align-items:center;gap:7px;padding:6px 9px;border:1px solid var(--border);border-radius:999px;font-size:11px;font-weight:900}
+.crew-badge[data-status="RUNNING"]{color:var(--blue);border-color:rgba(56,189,248,.5)}
+.crew-badge[data-status="DONE"]{color:var(--green);border-color:rgba(34,197,94,.5)}
+.crew-badge[data-status="ERROR"]{color:var(--red);border-color:rgba(239,68,68,.55)}
+.crew-status-dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex:0 0 auto}
+.crew-badge[data-status="RUNNING"] .crew-status-dot{background:transparent;border:2px solid rgba(56,189,248,.35);border-top-color:var(--blue);animation:crew-spin .8s linear infinite}
+@keyframes crew-spin{to{transform:rotate(360deg)}}
+.crew-output-label{margin-top:18px;padding-top:14px;border-top:1px solid var(--border);font-size:10px;color:var(--muted);font-weight:900;letter-spacing:.8px}
+.crew-output{margin:8px 0 0;min-height:120px;max-height:310px;color:#dbeafe;font-family:Inter,Segoe UI,Arial,sans-serif;font-size:13px}
+.crew-arrow{display:flex;align-items:center;justify-content:center;color:var(--blue);font-size:24px;font-weight:900}
+.crew-results{display:grid;grid-template-columns:minmax(230px,.35fr) minmax(0,1fr);gap:18px;margin-top:18px}
+.crew-result-text{min-height:130px;max-height:430px;color:#e2e8f0}
+.crew-error-panel{display:none;margin-top:12px;padding:12px;border:1px solid rgba(239,68,68,.5);border-radius:12px;background:rgba(127,29,29,.16);color:#fecaca}
+.crew-error-panel.is-visible{display:block}
+@media(max-width:900px){
+    .crew-hero,.crew-control-grid{grid-template-columns:1fr;display:grid}
+    .crew-flow{grid-template-columns:1fr;gap:10px}
+    .crew-arrow{transform:rotate(90deg);height:28px}
+    .crew-results{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+    header,.container{padding-left:16px;padding-right:16px}
+    .header-row{align-items:flex-start;flex-direction:column}
+    .crew-summary-grid{grid-template-columns:1fr}
+    .crew-meta{width:100%}
+}
 </style>
 </head>
 
@@ -189,14 +277,104 @@ summary{
 <header>
     <div class="header-row">
         <div>
-            <h1>AI Agent Control Center</h1>
-            <div class="subtitle">Agente IA Autónomo · AWS EC2 · Docker · Flask · RAG · MCP · Telegram</div>
+            <h1>AI MULTI-AGENT PLATFORM</h1>
+            <div class="subtitle">CrewAI Execution Dashboard</div>
         </div>
         <div id="general_state" class="pill">Cargando...</div>
     </div>
 </header>
 
 <div class="container">
+
+<section class="crew-shell" aria-labelledby="crew-dashboard-title">
+    <div class="card">
+        <div class="crew-hero">
+            <div>
+                <div class="crew-eyebrow">REAL-TIME CREW ORCHESTRATION</div>
+                <h2 id="crew-dashboard-title" class="crew-title">Research → Analysis → Validation</h2>
+                <div class="crew-subtitle">Ejecución secuencial basada exclusivamente en eventos reales de CrewAI.</div>
+            </div>
+            <div class="crew-meta" aria-label="Metadatos de ejecución">
+                <div class="crew-meta-row"><span class="crew-meta-label">Process</span><span class="crew-meta-value">Sequential</span></div>
+                <div class="crew-meta-row"><span class="crew-meta-label">Run ID</span><span id="crew_run_id" class="crew-meta-value">Sin ejecución</span></div>
+                <div class="crew-meta-row"><span class="crew-meta-label">Status URL</span><span id="crew_status_url" class="crew-meta-value">—</span></div>
+                <div class="crew-meta-row"><span class="crew-meta-label">Data Source</span><span id="crew_data_source" class="crew-meta-value">MANUAL</span></div>
+                <div class="crew-meta-row"><span class="crew-meta-label">Source Name</span><span id="crew_source_name" class="crew-meta-value">—</span></div>
+            </div>
+        </div>
+
+        <div class="crew-control-grid">
+            <div>
+                <label class="crew-field-label" for="crew_topic">¿Qué quieres que analice el equipo de agentes?</label>
+                <textarea id="crew_topic" maxlength="4000" placeholder="Describe el objetivo de investigación y las consideraciones que debe cubrir la Crew."></textarea>
+                <div class="crew-help"><span>Máximo 4000 caracteres</span><span id="crew_topic_count">0 / 4000</span></div>
+                <label class="crew-field-label" for="crew_token" style="margin-top:14px">TOKEN DE ACCESO</label>
+                <div class="crew-token-row">
+                    <input id="crew_token" type="password" autocomplete="off" placeholder="CREW_DASHBOARD_TOKEN">
+                    <button id="crew_token_save" type="button">USAR TOKEN</button>
+                </div>
+                <div class="crew-field-label" style="margin-top:14px">FUENTE DE DATOS</div>
+                <div class="crew-source-toggle" role="group" aria-label="Fuente de datos">
+                    <button id="crew_source_manual" class="is-selected" type="button">Manual</button>
+                    <button id="crew_source_api" type="button">API</button>
+                </div>
+                <div id="crew_api_panel" class="crew-api-panel">
+                    <div class="crew-summary-label">FUENTE CONFIGURADA: JSONPLACEHOLDER TODO</div>
+                    <button id="crew_api_load" type="button">CARGAR DATOS API</button>
+                    <div class="crew-summary-label">API PREVIEW</div>
+                    <pre id="crew_api_preview" class="crew-api-preview">Carga la fuente para obtener datos reales.</pre>
+                </div>
+                <button id="crew_run_button" type="button">EJECUTAR CREW</button>
+                <div id="crew_feedback" class="crew-feedback" role="status" aria-live="polite">Lista para iniciar una ejecución.</div>
+            </div>
+            <div class="crew-summary-grid">
+                <div class="crew-summary-box">
+                    <div class="crew-summary-label">CREW STATUS</div>
+                    <div id="crew_overall_status" class="crew-summary-value warn">IDLE</div>
+                </div>
+                <div class="crew-summary-box">
+                    <div class="crew-summary-label">VALIDATION STATUS</div>
+                    <div id="crew_validation_status" class="crew-summary-value warn">PENDING</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="crew-flow" aria-label="Flujo secuencial de agentes">
+            <article id="crew_researcher_card" class="crew-agent" data-status="WAITING">
+                <div class="crew-agent-top"><div class="crew-agent-name">RESEARCHER</div><div id="crew_researcher_badge" class="crew-badge" data-status="WAITING"><span class="crew-status-dot"></span><span id="crew_researcher_status">WAITING</span></div></div>
+                <div class="crew-agent-role">Investiga y organiza la información.</div>
+                <div class="crew-output-label">TASK OUTPUT</div>
+                <pre id="crew_researcher_output" class="crew-output">Disponible cuando Researcher complete su Task.</pre>
+            </article>
+            <div class="crew-arrow" aria-hidden="true">→</div>
+            <article id="crew_analyst_card" class="crew-agent" data-status="WAITING">
+                <div class="crew-agent-top"><div class="crew-agent-name">ANALYST</div><div id="crew_analyst_badge" class="crew-badge" data-status="WAITING"><span class="crew-status-dot"></span><span id="crew_analyst_status">WAITING</span></div></div>
+                <div class="crew-agent-role">Analiza relaciones, patrones y conclusiones.</div>
+                <div class="crew-output-label">TASK OUTPUT</div>
+                <pre id="crew_analyst_output" class="crew-output">Disponible cuando Analyst complete su Task.</pre>
+            </article>
+            <div class="crew-arrow" aria-hidden="true">→</div>
+            <article id="crew_validator_card" class="crew-agent" data-status="WAITING">
+                <div class="crew-agent-top"><div class="crew-agent-name">VALIDATOR</div><div id="crew_validator_badge" class="crew-badge" data-status="WAITING"><span class="crew-status-dot"></span><span id="crew_validator_status">WAITING</span></div></div>
+                <div class="crew-agent-role">Revisa coherencia, soporte y calidad final.</div>
+                <div class="crew-output-label">TASK OUTPUT</div>
+                <pre id="crew_validator_output" class="crew-output">Disponible cuando Validator complete su Task.</pre>
+            </article>
+        </div>
+
+        <div class="crew-results">
+            <div class="crew-summary-box">
+                <div class="crew-summary-label">VALIDATION STATUS</div>
+                <div id="crew_validation_detail" class="crew-summary-value warn">PENDING</div>
+                <div id="crew_error_panel" class="crew-error-panel"><strong>Error:</strong> <span id="crew_error_message"></span></div>
+            </div>
+            <div class="crew-summary-box">
+                <div class="crew-summary-label">FINAL RESULT</div>
+                <pre id="crew_final_output" class="crew-result-text">Esperando resultado final...</pre>
+            </div>
+        </div>
+    </div>
+</section>
 
 <div class="executive">
     <div class="card">
@@ -319,6 +497,216 @@ summary{
 </div>
 
 <script>
+const crewAgentKeys=["researcher","analyst","validator"];
+let crewPollingTimer=null;
+let activeCrewRunId=null;
+let crewSourceMode="manual";
+let activeIngestionId=null;
+
+function crewToken(){
+    return sessionStorage.getItem("crew_dashboard_token") || "";
+}
+
+function crewRequestHeaders(){
+    return {"Content-Type":"application/json","Authorization":"Bearer "+crewToken()};
+}
+
+function setCrewControlsRunning(running){
+    document.getElementById("crew_run_button").disabled=running;
+    document.getElementById("crew_api_load").disabled=running;
+    document.getElementById("crew_source_manual").disabled=running;
+    document.getElementById("crew_source_api").disabled=running;
+    document.getElementById("crew_token_save").disabled=running;
+    document.getElementById("crew_token").disabled=running;
+}
+
+function crewViewModel(run){
+    const status=run && run.status ? String(run.status) : "IDLE";
+    const agents=run && run.agents ? run.agents : {};
+    const result={status,agents:{},validationStatus:"PENDING",finalOutput:"Esperando resultado final...",error:null};
+    crewAgentKeys.forEach(key=>{
+        const agent=agents[key] || {};
+        result.agents[key]={
+            status:agent.status || "WAITING",
+            output:run && run[key==="researcher"?"research_output":key==="analyst"?"analysis_output":"validation_output"] || null
+        };
+    });
+    if(run && run.validation_status) result.validationStatus=String(run.validation_status);
+    else if(status==="ERROR") result.validationStatus="NO DISPONIBLE";
+    if(run && run.final_output) result.finalOutput=String(run.final_output);
+    else if(status==="ERROR") result.finalOutput="No disponible";
+    if(status==="ERROR" && run && run.error) result.error=String(run.error);
+    return result;
+}
+
+function setCrewFeedback(message,type=""){
+    const el=document.getElementById("crew_feedback");
+    el.textContent=message;
+    el.className="crew-feedback"+(type?" is-"+type:"");
+}
+
+function renderCrewState(run){
+    const view=crewViewModel(run);
+    const overall=document.getElementById("crew_overall_status");
+    overall.textContent=view.status;
+    overall.className="crew-summary-value "+(view.status==="DONE"?"ok":view.status==="ERROR"?"error":view.status==="RUNNING"?"info":"warn");
+
+    crewAgentKeys.forEach(key=>{
+        const data=view.agents[key];
+        document.getElementById("crew_"+key+"_status").textContent=data.status;
+        document.getElementById("crew_"+key+"_card").dataset.status=data.status;
+        document.getElementById("crew_"+key+"_badge").dataset.status=data.status;
+        document.getElementById("crew_"+key+"_output").textContent=data.output || "Disponible cuando "+key.charAt(0).toUpperCase()+key.slice(1)+" complete su Task.";
+    });
+
+    ["crew_validation_status","crew_validation_detail"].forEach(id=>{
+        const el=document.getElementById(id);
+        el.textContent=view.validationStatus;
+        el.className="crew-summary-value "+(view.validationStatus==="APPROVED"?"ok":view.validationStatus==="NEEDS_REVISION"||view.validationStatus==="NO DISPONIBLE"?"error":"warn");
+    });
+    document.getElementById("crew_final_output").textContent=view.finalOutput;
+    const sourceType=run && run.source_type ? String(run.source_type).toUpperCase() : crewSourceMode.toUpperCase();
+    document.getElementById("crew_data_source").textContent=sourceType;
+    document.getElementById("crew_source_name").textContent=run && run.source_name ? String(run.source_name) : "—";
+    const errorPanel=document.getElementById("crew_error_panel");
+    document.getElementById("crew_error_message").textContent=view.error || "";
+    errorPanel.classList.toggle("is-visible",Boolean(view.error));
+    setCrewControlsRunning(view.status==="RUNNING");
+    return view;
+}
+
+function stopCrewPolling(){
+    if(crewPollingTimer!==null){clearTimeout(crewPollingTimer);crewPollingTimer=null;}
+}
+
+async function pollCrewStatus(){
+    if(!activeCrewRunId) return;
+    try{
+        const response=await fetch(
+            "/api/crew/status/"+encodeURIComponent(activeCrewRunId),
+            {headers:{"Authorization":"Bearer "+crewToken()}}
+        );
+        const run=await response.json();
+        if(response.status===401){
+            stopCrewPolling();
+            activeCrewRunId=null;
+            setCrewControlsRunning(false);
+            setCrewFeedback("La sesión o el token de acceso no son válidos.","error");
+            return;
+        }
+        if(!response.ok) throw new Error(run.error || "No se pudo consultar la ejecución.");
+        const view=renderCrewState(run);
+        if(view.status==="DONE" || view.status==="ERROR"){
+            stopCrewPolling();
+            activeCrewRunId=null;
+            setCrewControlsRunning(false);
+            setCrewFeedback(view.status==="DONE"?"Ejecución completada.":"La ejecución terminó con error.",view.status==="ERROR"?"error":"");
+            return;
+        }
+        crewPollingTimer=setTimeout(pollCrewStatus,1500);
+    }catch(error){
+        stopCrewPolling();
+        activeCrewRunId=null;
+        setCrewControlsRunning(false);
+        setCrewFeedback(error.message || "Error consultando la ejecución.","error");
+    }
+}
+
+async function ejecutarCrew(){
+    const topic=document.getElementById("crew_topic").value.trim();
+    if(!topic){setCrewFeedback("Escribe un objetivo antes de ejecutar la Crew.","error");return;}
+    if(topic.length>4000){setCrewFeedback("El objetivo no puede superar 4000 caracteres.","error");return;}
+    if(activeCrewRunId){setCrewFeedback("Ya existe una ejecución Crew activa.","error");return;}
+    if(!crewToken()){setCrewFeedback("Introduce el token de acceso antes de continuar.","error");return;}
+    if(crewSourceMode==="api" && activeIngestionId===null){setCrewFeedback("Carga y revisa los datos API antes de ejecutar.","error");return;}
+
+    stopCrewPolling();
+    setCrewControlsRunning(true);
+    setCrewFeedback("Enviando objetivo a la Crew...","active");
+    try{
+        const response=await fetch("/api/crew/run",{
+            method:"POST",
+            headers:crewRequestHeaders(),
+            body:JSON.stringify(crewSourceMode==="api" ? {topic,source_type:"api",ingestion_id:activeIngestionId} : {topic})
+        });
+        const data=await response.json();
+        if(response.status===409){
+            setCrewControlsRunning(false);
+            setCrewFeedback("Ya existe una ejecución Crew activa.","error");
+            return;
+        }
+        if(response.status!==202) throw new Error(data.error || "No se pudo iniciar la Crew.");
+
+        activeCrewRunId=data.run_id;
+        document.getElementById("crew_run_id").textContent=data.run_id;
+        document.getElementById("crew_status_url").textContent=data.status_url;
+        renderCrewState({status:data.status,agents:{},source_type:data.source_type,source_name:data.source_name});
+        setCrewFeedback("Ejecución en curso. Los estados provienen del backend.","active");
+        await pollCrewStatus();
+    }catch(error){
+        activeCrewRunId=null;
+        setCrewControlsRunning(false);
+        setCrewFeedback(error.message || "Error iniciando la Crew.","error");
+    }
+}
+
+function selectCrewSource(mode){
+    if(activeCrewRunId) return;
+    crewSourceMode=mode;
+    document.getElementById("crew_source_manual").classList.toggle("is-selected",mode==="manual");
+    document.getElementById("crew_source_api").classList.toggle("is-selected",mode==="api");
+    document.getElementById("crew_api_panel").classList.toggle("is-visible",mode==="api");
+    document.getElementById("crew_data_source").textContent=mode.toUpperCase();
+    document.getElementById("crew_source_name").textContent=mode==="api" && activeIngestionId!==null ? "JSONPlaceholder Todo" : "—";
+    setCrewFeedback(mode==="api"?"Carga la fuente API antes de ejecutar.":"Modo Manual listo.");
+}
+
+async function loadCrewApiData(){
+    if(!crewToken()){setCrewFeedback("Introduce el token de acceso antes de cargar datos.","error");return;}
+    if(activeCrewRunId) return;
+    setCrewControlsRunning(true);
+    setCrewFeedback("Consultando fuente API permitida...","active");
+    try{
+        const response=await fetch("/api/ingestion/api",{
+            method:"POST",
+            headers:crewRequestHeaders(),
+            body:JSON.stringify({source:"jsonplaceholder_todo"})
+        });
+        const result=await response.json();
+        if(!response.ok) throw new Error(result.error || "No se pudo cargar la fuente API.");
+        activeIngestionId=result.ingestion_id;
+        document.getElementById("crew_api_preview").textContent=result.preview;
+        document.getElementById("crew_source_name").textContent=result.source_name;
+        setCrewFeedback("Datos API cargados. Preview listo para revisión.");
+    }catch(error){
+        activeIngestionId=null;
+        document.getElementById("crew_api_preview").textContent="No hay datos API disponibles.";
+        document.getElementById("crew_source_name").textContent="—";
+        setCrewFeedback(error.message || "Error cargando la fuente API.","error");
+    }finally{
+        setCrewControlsRunning(Boolean(activeCrewRunId));
+    }
+}
+
+document.getElementById("crew_run_button").addEventListener("click",ejecutarCrew);
+document.getElementById("crew_source_manual").addEventListener("click",()=>selectCrewSource("manual"));
+document.getElementById("crew_source_api").addEventListener("click",()=>selectCrewSource("api"));
+document.getElementById("crew_api_load").addEventListener("click",loadCrewApiData);
+document.getElementById("crew_token_save").addEventListener("click",()=>{
+    const token=document.getElementById("crew_token").value;
+    if(!token){
+        sessionStorage.removeItem("crew_dashboard_token");
+        setCrewFeedback("Token eliminado de esta sesión.");
+        return;
+    }
+    sessionStorage.setItem("crew_dashboard_token",token);
+    setCrewFeedback("Token guardado únicamente durante esta sesión.");
+});
+document.getElementById("crew_token").value=crewToken();
+document.getElementById("crew_topic").addEventListener("input",event=>{
+    document.getElementById("crew_topic_count").textContent=event.target.value.length+" / 4000";
+});
+
 const pmFlowMap = [
     ["intake","Intake","Entrada"],
     ["document_agent","Document Agent","OCR / Documento"],
@@ -560,5 +948,3 @@ setInterval(cargarDashboard,2000);
 </script>
 </body>
 </html>
-EOF
-

@@ -9,7 +9,7 @@ from context_builder import construir_prompt_rag
 load_dotenv()
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-MODELO_RAG = "llama-3.1-8b-instant"
+MODELO_RAG = "openai/gpt-oss-20b"
 
 client = Groq(api_key=GROQ_API_KEY)
 

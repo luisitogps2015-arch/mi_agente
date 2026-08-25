@@ -39,7 +39,7 @@ TAVILY_API_KEY = os.getenv("TAVILY_API_KEY",  "")
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN",  "")
 CHAT_ID        = os.getenv("CHAT_ID",         "")
 
-MODELO = "llama-3.1-8b-instant"
+MODELO = "openai/gpt-oss-20b"
 
 
 # ── SQLite helpers ────────────────────────────────────────────────────────────

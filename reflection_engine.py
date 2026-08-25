@@ -6,7 +6,7 @@ from critic_engine import evaluar_ejecucion
 
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-MODELO_REFLECTION = "llama-3.1-8b-instant"
+MODELO_REFLECTION = "openai/gpt-oss-20b"
 
 client = Groq(api_key=GROQ_API_KEY)
 
